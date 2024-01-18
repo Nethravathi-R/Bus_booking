@@ -10,7 +10,6 @@ pipeline {
         sh 'git clone https://github.com/Nethravathi-R/Bus_booking.git'
       }
         }
-        }
 
         stage('build') {
             steps {
@@ -47,7 +46,17 @@ pipeline {
         sh 'scp /home/slave1/workspace/BusBooking/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.90.86:/opt/apache-tomcat-8.5.98/webapps'
                         
       }
-    }        
-}
+    }
+        
+    }
+        
+    post {
+        success {
+            echo "Build, Run, and Deployment to Tomcat successful!"
+        }
+        failure {
+            echo "Build, Run, and Deployment to Tomcat failed!"
+        }
+    }
 }
 
