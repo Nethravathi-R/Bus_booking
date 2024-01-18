@@ -15,7 +15,7 @@ pipeline{
     }
     stage ( 'deploy' ) {
       steps {
-        sh 'cp /home/slave1/workspace/BusBooking/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.90.86:/opt/apache-tomcat-8.5.98/webapps'
+        sh 'cp /home/slave1/workspace/BusBooking/target/bus-booking-app-1.0-SNAPSHOT.jar root@ip-172-31-90-86:/opt/apache-tomcat-8.5.98/webapps'
       }
     }
   }
