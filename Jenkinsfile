@@ -16,7 +16,10 @@ pipeline{
     stage ( 'deploy' ) {
       steps {
         sh 'ssh root@172.31.90.86'
-        sh 'cp /home/slave1/workspace/BusBooking/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.90.86:/opt/apache-tomcat-8.5.98/webapps'
+        sh 'scp /home/slave1/workspace/BusBooking/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.90.86:/opt/apache-tomcat-8.5.98/webapps'
+        // Restart Tomcat
+                sh "root@172.31.90.86:/opt/apache-tomcat-8.5.98/bin/shutdown.sh"
+                sh "root@172.31.90.86:/opt/apache-tomcat-8.5.98/bin/startup.sh"
       }
     }
   }
