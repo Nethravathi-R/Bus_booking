@@ -66,4 +66,3 @@ pipeline {
             echo "Build, Run, and Deployment to Tomcat failed!"
         }
     }
-}
