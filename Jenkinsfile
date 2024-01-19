@@ -18,7 +18,13 @@ pipeline {
                     sh 'mvn clean install'
                 }
             }
-        }
+        }stage("SonarQube analysis") {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh 'mvn clean package sonar:sonar'
+              }
+            }
+        }		
 
         stage('Show Contents of target') {
             steps {
@@ -41,7 +47,7 @@ pipeline {
         }
         
         stage ( 'deploy' ) {
-      steps {
+		steps {
         sh 'ssh root@172.31.46.40'
         sh 'scp /home/slave1/workspace/BusBooking/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.46.40:/opt/apache-tomcat-8.5.98/webapps'
                         
@@ -59,4 +65,3 @@ pipeline {
         }
     }
 }
-
