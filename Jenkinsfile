@@ -1,49 +1,61 @@
-pipeline	{
-    agent	{
-        label 'java'
-    }
-
-        stages {
-        stage('checkout')	{	
-            steps	{
-				sh 'rm -rf Bus_booking'
-				sh 'git clone https://github.com/Nethravathi-R/Bus_booking.git'
-				}
-			}
+pipeline {
+    agent { label 'java' }
+    stages {
+        stage('checkout') {
+            steps {
+                sh 'rm -rf Bus_booking'
+                sh 'git clone https://github.com/Nethravathi-R/Bus_booking.git'
+            }
+        }
 
         stage('build') {
-        steps 	{
-                script 	{
-                    sh 'mvn --version'
-                    sh 'mvn clean install'
+            steps {
+                script {
+                    sh "mvn clean install"
                 }
             }
-		}
-		
-		stage("SonarQube analysis")	{
-            steps 	{
-                withSonarQubeEnv('sonar')	{
-                    sh 'mvn clean package sonar:sonar'
-				}
-            }
-        }		
+        }
 
-                
-        stage ( 'deploy' )	{
-		steps 	{
-				sh 'ssh root@172.31.46.40'
-				sh 'scp /home/slave1/workspace/BusBooking/target/bus-booking-app-1.0-SNAPSHOT.jar root@172.31.46.40:/opt/apache-tomcat-8.5.98/webapps'
+        stage('Deploy to JFrog Artifactory') {
+            steps {
+                // Remember this is the step which I followed for free style project.
+                script {
+                    rtServer(
+                        id: "Artifact",
+                        url: "http://18.206.120.83:8082/artifactory",
+                        username: "admin",
+                        password: "Hiriyur@123"
+                    )
                 }
-			}
+            }
         }
-	
-       
-        post	{	
-        success {
-            echo "Build, Run, and Deployment to Tomcat successful!"
+
+        stage('Upload') {
+            steps {
+                script {
+                    // For my understanding, rtUpload is a part of JFrog Artifactory plugin to upload artifacts to artifacts repo
+                    rtUpload (
+                        serverId: 'Artifact',
+                        spec: '''{
+                            "files": [
+                                {
+                                    "pattern": "target/*.jar",
+                                    "target": "libs-release-local/"
+                                }
+                            ]
+                        }'''
+                    )
+                }
+            }
         }
-        failure {
-            echo "Build, Run, and Deployment to Tomcat failed!"
-        }
+
+        stage('Publish build info') {
+            steps {
+                script {
+                    // For my understanding to publish build info
+                    rtPublishBuildInfo serverId: "Artifact"
+                }
+            }
+    }
     }
 }
